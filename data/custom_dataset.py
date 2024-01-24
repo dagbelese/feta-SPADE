@@ -16,20 +16,34 @@ class CustomDataset(Pix2pixDataset):
     @staticmethod
     def modify_commandline_options(parser, is_train):
         parser = Pix2pixDataset.modify_commandline_options(parser, is_train)
-        parser.set_defaults(preprocess_mode='resize_and_crop')
-        load_size = 286 if is_train else 256
-        parser.set_defaults(load_size=load_size)
-        parser.set_defaults(crop_size=256)
-        parser.set_defaults(display_winsize=256)
-        parser.set_defaults(label_nc=13)
+        parser.set_defaults(gpu_ids='0')
+        parser.set_defaults(batchSize=32)
+        parser.set_defaults(preprocess_mode='none')
+        parser.set_defaults(load_size=160)
+        parser.set_defaults(crop_size=160)
+        parser.set_defaults(display_winsize=160)
+        parser.set_defaults(label_nc=255)
         parser.set_defaults(contain_dontcare_label=False)
+        parser.set_defaults(output_nc=3)
+        parser.set_defaults(no_flip=True)
+        parser.set_defaults(nThreads=0)
+        parser.set_defaults(cache_filelist_write=False)
+        parser.set_defaults(cache_filelist_read=False)
+        parser.set_defaults(no_instance=True)
+        parser.set_defaults(z_dim=256)
+        parser.set_defaults(display_freq=1000)
+        parser.set_defaults(print_freq=1000)
+        parser.set_defaults(save_latest_freq=10000)
 
-        parser.add_argument('--label_dir', type=str, required=True,
-                            help='path to the directory that contains label images')
-        parser.add_argument('--image_dir', type=str, required=True,
-                            help='path to the directory that contains photo images')
+        parser.set_defaults(label_dir='/media/m-ssd3/damola/dataset/training2d/mask_z/')
+        parser.set_defaults(image_dir='/media/m-ssd3/damola/dataset/training2d/image_z/')
+
+        parser.add_argument('--label_dir', type=str, required=False,
+                            help='/media/m-ssd3/damola/feta_dataset/training/mask2d/')
+        parser.add_argument('--image_dir', type=str, required=False,
+                            help='/media/m-ssd3/damola/feta_dataset/training/image2d/')
         parser.add_argument('--instance_dir', type=str, default='',
-                            help='path to the directory that contains instance maps. Leave black if not exists')
+                            help='path to the directory that contains instance maps. Leave blank if not exists')
         return parser
 
     def get_paths(self, opt):

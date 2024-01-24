@@ -104,7 +104,6 @@ class Pix2PixModel(torch.nn.Module):
     # preprocess the input, such as moving the tensors to GPUs and
     # transforming the label map to one-hot encoding
     # |data|: dictionary of the input data
-
     def preprocess_input(self, data):
         # move to GPU and change data types
         data['label'] = data['label'].long()
@@ -115,12 +114,21 @@ class Pix2PixModel(torch.nn.Module):
 
         # create one-hot label map
         label_map = data['label']
+        #unique_labels = torch.unique(label_map)
+        #print("Unique labels in label_map:", unique_labels)
         bs, _, h, w = label_map.size()
         nc = self.opt.label_nc + 1 if self.opt.contain_dontcare_label \
             else self.opt.label_nc
-        input_label = self.FloatTensor(bs, nc, h, w).zero_()
-        input_semantics = input_label.scatter_(1, label_map, 1.0)
+        #input_label = self.FloatTensor(bs, nc, h, w).zero_()
+        #input_semantics = input_label.scatter_(1, label_map, 1.0)
 
+        input_semantics = torch.zeros(bs, nc, h, w, device=label_map.device)
+
+        # manually create one-hot encoding
+        for i in range(nc):
+            mask = (label_map == i)
+            input_semantics[:, i, :, :] = mask.squeeze(1).float()
+  
         # concatenate instance map if it exists
         if not self.opt.no_instance:
             inst_map = data['instance']
